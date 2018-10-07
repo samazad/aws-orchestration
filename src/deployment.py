@@ -22,7 +22,21 @@ def main():
     igw_id = igw_response['InternetGateway']['InternetGatewayId']
 
     # Attaching the IGW to the VPC
-    igw_attach_response = vpc.attach_igw_to_vpc(igw_id, vpc_id)
+    vpc.attach_igw_to_vpc(igw_id, vpc_id)
+
+    # Create a public subnet
+    public_subnet_response = vpc.create_subnet(vpc_id, '10.0.1.0/24')
+    print('Public Subnet Created: ' + str(public_subnet_response))
+
+    # Create a RT for the Public subnets, reserving default RT for Private subnets
+    public_rt_response = vpc.create_public_rt(vpc_id)
+    print('Public RT created: ' + str(public_rt_response))
+    rt_id = public_rt_response['RouteTable']['RouteTableId']
+
+    # Adding default route pointing to the IGW in Public RT
+    vpc.add_def_route(rt_id, igw_id)
+
+    # Associate Public RT with Public Subnet
 
 
 if __name__ == '__main__':
