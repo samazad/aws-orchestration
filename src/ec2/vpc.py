@@ -33,7 +33,7 @@ class VPC:
         return self._client.create_route_table(VpcId=vpc_id)
 
     def add_def_route(self, rt_id, igw_id):
-        print('Adding default route pointing to IGW in public RT')
+        print('Adding default route pointing to IGW ' + igw_id + ' in public RT ' + rt_id)
         return self._client.create_route(
             RouteTableId=rt_id,
             DestinationCidrBlock='0.0.0.0/0',
@@ -43,3 +43,6 @@ class VPC:
     def associate_subnet_with_rt(self, subnet_id, rt_id):
         print('Associating subnet ' + subnet_id + ' with RT ' + rt_id)
         return self._client.associate_route_table(SubnetId=subnet_id, RouteTableId=rt_id)
+
+    def allow_auto_assign_ip_address_for_subnet(self, subnet_id):
+        return self._client.modify_subnet_attribute(SubnetId=subnet_id, MapPublicIpOnLaunch={'Value': True})

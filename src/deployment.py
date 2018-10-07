@@ -24,9 +24,14 @@ def main():
     # Attaching the IGW to the VPC
     vpc.attach_igw_to_vpc(igw_id, vpc_id)
 
-    # Create a public subnet
+    # Create public subnet
     public_subnet_response = vpc.create_subnet(vpc_id, '10.0.1.0/24')
     print('Public Subnet Created: ' + str(public_subnet_response))
+    public_subnet_id = public_subnet_response['Subnet']['SubnetId']
+
+    # Name the public subnet
+    public_subnet_name = 'Sam-Public-Subnet'
+    vpc.add_name_tag(public_subnet_id, public_subnet_name)
 
     # Create a RT for the Public subnets, reserving default RT for Private subnets
     public_rt_response = vpc.create_public_rt(vpc_id)
@@ -36,7 +41,20 @@ def main():
     # Adding default route pointing to the IGW in Public RT
     vpc.add_def_route(rt_id, igw_id)
 
-    # Associate Public RT with Public Subnet
+    # Associate Public Subnet with Public RT
+    vpc.associate_subnet_with_rt(public_subnet_id, rt_id)
+
+    # Allow auto-assign public ip for subnet
+    vpc.allow_auto_assign_ip_address_for_subnet(public_subnet_id)
+
+    # Create private subnet
+    private_subnet_response = vpc.create_subnet(vpc_id, '10.0.2.0/24')
+    print('Private Subnet Created: ' + str(private_subnet_response))
+    private_subnet_id = private_subnet_response['Subnet']['SubnetId']
+
+    # Name the private subnet
+    private_subnet_name = 'Sam-Private-Subnet'
+    vpc.add_name_tag(private_subnet_id, private_subnet_name)
 
 
 if __name__ == '__main__':
